@@ -1,3 +1,8 @@
+# Set to true if this is a frozen release branch
+ROCK_FROZEN = false
+# The name of the "current" release
+ROCK_CURRENT_RELEASE = "rock1408_rc1"
+
 #
 # Orocos Specific ignore rules
 #
@@ -34,27 +39,40 @@ require File.join(File.dirname(__FILE__), 'rock/flavor_definition')
 require File.join(File.dirname(__FILE__), 'rock/flavor_manager')
 require File.join(File.dirname(__FILE__), 'rock/in_flavor_context')
 
-Rock.flavors.define 'stable'
-Rock.flavors.define 'next',  :includes => ['stable']
-Rock.flavors.define 'master', :includes => ['stable', 'next'], :implicit => true
+Rock.flavors.define 'stable', :branch => ROCK_CURRENT_RELEASE
+Rock.flavors.alias 'stable', 'next'
+Rock.flavors.define ROCK_CURRENT_RELEASE
+Rock.flavors.define 'master', :implicit => true
 
-configuration_option('ROCK_FLAVOR', 'string',
-    :default => 'stable',
-    :possible_values => Rock.flavors.flavors.keys,
+configuration_option('ROCK_SELECTED_FLAVOR', 'string',
+    :default => ROCK_CURRENT_RELEASE,
+    :possible_values => ['stable', 'master', ROCK_CURRENT_RELEASE],
     :doc => [
         "Which flavor of Rock do you want to use ?",
-        "The 'stable' flavor is not updated often, but will contain well-tested code",
-        "The 'next' flavor is updated more often, and might contain less tested code",
-        "it is updated from 'master' to test new features before they get pushed in 'stable'",
-        "Finally, 'master' is where the development takes place. It should generally be in",
-        "a good state, but will break every once in a while",
-        "",
-        "See http://rock-robotics.org/startup/releases.html for more information"])
+        "Use either the release name #{ROCK_CURRENT_RELEASE} to use this released, known-to work",
+        "version of Rock that is guaranteed to not change. Or use the keywords 'stable' to",
+        "always track the latest release and 'master' for the development branch"])
+
+# Migrate the value in ROCK_FLAVOR to ROCK_SELECTED_FLAVOR
+if Autoproj.has_config_key?('ROCK_FLAVOR')
+    Autoproj.change_option('ROCK_SELECTED_FLAVOR', Autoproj.user_config('ROCK_FLAVOR'), true)
+end
 
 
-Rock.flavors.select_current_flavor_by_name(
-    ENV['ROCK_FORCE_FLAVOR'] || Autoproj.user_config('ROCK_FLAVOR'))
-Autoproj.change_option('ROCK_FLAVOR', Rock.flavors.current_flavor.name, true)
+if ROCK_FROZEN
+    Rock.flavors.select_current_flavor_by_name(
+        ENV['ROCK_FORCE_FLAVOR'] || ROCK_CURRENT_RELEASE)
+else
+    Rock.flavors.select_current_flavor_by_name(
+        ENV['ROCK_FORCE_FLAVOR'] || Autoproj.user_config('ROCK_SELECTED_FLAVOR'))
+end
+
+current_flavor = Rock.flavors.current_flavor
+Autoproj.change_option('ROCK_SELECTED_FLAVOR', current_flavor.name, true)
+Autoproj.change_option('ROCK_FLAVOR', current_flavor.branch, true)
+Autoproj.change_option('ROCK_BRANCH', current_flavor.branch, true)
+Autoproj::PackageSet.add_source_file \
+    "source-#{if current_flavor.name == "master" then 'master' else 'stable' end}.yml"
 
 def enabled_flavor_system
     Rock.flavors.register_flavored_package_set(Autoproj.current_package_set)

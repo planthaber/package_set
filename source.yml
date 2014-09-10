@@ -47,9 +47,6 @@ version_control:
       github: rock-core/image_processing-$PACKAGE_BASENAME
       branch: $ROCK_FLAVOR
 
-    - tools/rubigen:
-      github: doudou/rubigen
-
     - tools/autoproj:
       github: doudou/autoproj
       branch: master
@@ -69,27 +66,16 @@ version_control:
     - base/templates/doc:
       gitorious: rock/doc_preview
       branch: $ROCK_FLAVOR
-    - eigen3: 
-      type: archive
-      url: https://bitbucket.org/eigen/eigen/get/3.2.1.tar.gz
-      update_cached_file: false
-    - external/sisl:
-      type: archive
-      url: http://www.sintef.no/upload/IKT/9011/geometri/sisl/sisl-4.5.0.tar.gz
-      update_cached_file: false
-
-    - external/opencv:
-        type: archive
-        url: http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/2.3/OpenCV-2.3.0.tar.bz2
-        update_cached_file: false
 
     - bundles/.*:
         github: rock-core/bundles-$PACKAGE_BASENAME.git
         branch: $ROCK_FLAVOR
 
+    - tools/rubigen:
+      github: doudou/rubigen
+      branch: master
+
 overrides:
     - ^(orogen|typelib|rtt|utilrb|utilmm|rtt_typelib|tools/metaruby)$:
         branch: $ROCK_FLAVOR
-    - (ocl|log4cpp):
-        branch: toolchain-2.6
 

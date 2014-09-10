@@ -14,6 +14,13 @@ end
 
 current_flavor = Rock.flavors.current_flavor
 
+release = Rock.flavors.flavor_by_name(ROCK_CURRENT_RELEASE)
+stable  = Rock.flavors.flavor_by_name('stable')
+release.default_packages.merge!(stable.default_packages) do |pkg_set, release_pkgs, stable_pkgs|
+    release_pkgs | stable_pkgs
+end
+release.removed_packages |= stable.removed_packages
+
 Rock.flavors.finalize
 switched_packages = Rock.flavors.reset_invalid_branches_to('master')
 wrong_branch = Rock.flavors.find_all_overriden_flavored_branches
@@ -71,7 +78,7 @@ Autoproj.manifest.each_autobuild_package do |pkg|
         pkg.optional_dependency 'tools/logger'
     end
 
-    if Autoproj.user_config('ROCK_FLAVOR') == 'master'
+    if Rock.flavors.current_flavor.name == 'master'
         pkg.orogen_options << '--extensions=metadata_support'
         pkg.depends_on 'tools/orogen_metadata'
     end
@@ -104,3 +111,5 @@ Autoproj.post_import do |pkg|
       pkg.define "CMAKE_EXPORT_COMPILE_COMMANDS", "ON"
    end
 end
+
+

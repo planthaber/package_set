@@ -68,23 +68,28 @@ module Rock
             end
         end
 
+        def find_all_flavors_by_branch(branch)
+            flavors.values.find_all { |flv| flv.branch == branch }
+        end
+
+        def alias(old_name, new_name)
+            flavors[new_name.to_str] = flavor_by_name(old_name)
+        end
+
         # Create a new flavor in the set of known flavors, and register it on
         # {flavors}
         #
         # @param [String] flavor_name the name of the new flavor
-        # @option options [Array<String>] :includes ([]) set of flavors that
-        #   are included in the new one. See {FlavorDefinition#includes}
         # @option options [Boolean] :implicit (nil) sets the new flavor's
         #   {FlavorDefinition#implicit?} flag
         # @return [FlavorDefinition]
         def define(flavor_name, options = Hash.new)
-            options = Kernel.validate_options(options, :includes => [], :implicit => nil)
+            options = Kernel.validate_options(options, :implicit => nil, :branch => flavor_name)
 
-            flavor = (flavors[flavor_name] ||= FlavorDefinition.new(flavor_name))
+            flavor = (flavors[flavor_name] ||= FlavorDefinition.new(flavor_name, options[:branch]))
             if !options[:implicit].nil?
                 flavor.implicit = options[:implicit]
             end
-            flavor.includes |= options[:includes]
             flavor
         end
 
@@ -179,7 +184,7 @@ module Rock
                 end
                 default_packages -= current_flavor.removed_packages
                 default_packages = default_packages.to_set
-                current_flavor.default_packages[pkg_set] = default_packages
+                current_flavor.default_packages[pkg_set.name] = default_packages
                 meta.packages.delete_if do |pkg|
                     !default_packages.include?(pkg.name)
                 end
@@ -197,14 +202,14 @@ module Rock
                 next if !pkg.importer.kind_of?(Autobuild::Git)
                 next if pkg.importer.branch == default_branch
 
-                if has_flavor?(pkg.importer.branch)
-                    if !package_in_flavor?(pkg, pkg.importer.branch)
-                        vcs_raw = pkg_def.vcs.raw.reverse.find { |pkg_set_name, options| options['branch'] }
-                        if !vcs_raw || vcs_raw[1]['branch'] !~ /ROCK_FLAVOR/
-                            switched_packages << pkg
-                        end
-                        pkg.importer.branch = default_branch
+                flavors = find_all_flavors_by_branch(pkg.importer.branch)
+                if !flavors.any? { |flv| flv.include?(pkg.name) }
+                    vcs_raw = pkg_def.vcs.raw.reverse.
+                        find { |pkg_set_name, options| options['branch'] }
+                    if !vcs_raw || vcs_raw[1]['branch'] !~ /ROCK_FLAVOR|ROCK_BRANCH/
+                        switched_packages << pkg
                     end
+                    pkg.importer.branch = default_branch
                 end
             end
             switched_packages
@@ -218,7 +223,9 @@ module Rock
                 pkg = pkg_def.autobuild
                 next if !pkg.importer.kind_of?(Autobuild::Git)
 
-                if package_in_flavor?(pkg, current_flavor.name) && pkg.importer.branch != current_flavor.name
+                if package_in_flavor?(pkg, current_flavor.name) &&
+                    pkg.importer.branch != current_flavor.branch
+
                     # We have to check whether it is expected to be using the flavor name as
                     # its branch. Some packages are not ...
                     #
@@ -228,8 +235,8 @@ module Rock
                     # entries apply)
                     vcs = pkg_def.vcs.raw.group_by(&:first)
                     branch_should_be_flavor_name = vcs.any? do |_, info|
-                        info.find { |_, vcs_options| vcs_options['branch'] && vcs_options['branch'] =~ /ROCK_FLAVOR/ } &&
-                            !info.find { |_, vcs_options| vcs_options['branch'] && vcs_options['branch'] !~ /ROCK_FLAVOR/ }
+                        !info.empty? &&
+                            info.all? { |_, vcs_options| vcs_options['branch'] && vcs_options['branch'] =~ /ROCK_FLAVOR|ROCK_BRANCH/ }
                     end
                     if branch_should_be_flavor_name
                         wrong_branch << pkg
