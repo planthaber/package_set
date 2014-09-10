@@ -6,46 +6,46 @@ imports:
 version_control:
     - base/.*:
       github: rock-core/base-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/orogen/.*:
       github: rock-core/base-orogen-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/templates/.*:
       github: rock-core/base-templates-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/templates/cmake_vizkit_widget:
       github: rock-core/base-templates-vizkit_widget
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/templates/vizkit:
       github: rock-core/base-templates-vizkit3d_plugin
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/doc:
       github: rock-core/base-doc
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
     - tools/[^/]*:
       github: rock-core/tools-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - tools/orogen/.*:
       github: rock-core/tools-orogen-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - tools/orocos.rb:
       github: rock-core/tools-orocosrb
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
     - drivers/.*:
       github: rock-core/drivers-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - gui/.*:
       github: rock-core/gui-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - drivers/orogen/.*:
       github: rock-core/drivers-orogen-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
     - image_processing/.*:
       github: rock-core/image_processing-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
     - tools/autoproj:
       github: doudou/autoproj
@@ -56,20 +56,20 @@ version_control:
 
     - base/orogen/interfaces:
       gitorious: rock-toolchain/orogen-base-interfaces
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - tools/port_proxy:
       gitorious: rock-toolchain/orogen-$PACKAGE_BASENAME
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - tools/orogen_ros:
       gitorious: rock-ros/orogen_ros
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
     - base/templates/doc:
       gitorious: rock/doc_preview
-      branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
     - bundles/.*:
-        github: rock-core/bundles-$PACKAGE_BASENAME.git
-        branch: $ROCK_FLAVOR
+      github: rock-core/bundles-$PACKAGE_BASENAME.git
+      branch: $ROCK_BRANCH
 
     - tools/rubigen:
       github: doudou/rubigen
@@ -77,5 +77,5 @@ version_control:
 
 overrides:
     - ^(orogen|typelib|rtt|utilrb|utilmm|rtt_typelib|tools/metaruby)$:
-        branch: $ROCK_FLAVOR
+      branch: $ROCK_BRANCH
 
