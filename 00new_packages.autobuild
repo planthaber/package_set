@@ -1,4 +1,5 @@
 # IMPORTANT: new packages must be added at the top of this file
 # They must NEVER be added to other files
 
-ruby_package 'gui/rock-webapp'
+ruby_package 'gui/rock_webapp'
+ruby_package 'tools/rest_api'
