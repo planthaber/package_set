@@ -1,5 +1,7 @@
 # IMPORTANT: new packages must be added at the top of this file
 # They must NEVER be added to other files
 
-ruby_package 'gui/rock_webapp'
-ruby_package 'tools/rest_api'
+cmake_package 'gui/rock_webapp'
+ruby_package 'tools/rest_api' do |pkg|
+    Autoproj.env_add_path 'ROCK_WEBAPP', File.join(pkg.prefix, 'share', 'rest_api')
+end
