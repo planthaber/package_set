@@ -29,7 +29,7 @@ end
 
 require 'autoproj/gitorious'
 if !Autoproj.has_source_handler? 'gitorious'
-    Autoproj.gitorious_server_configuration('GITORIOUS', 'gitorious.org')
+    Autoproj.gitorious_server_configuration('GITORIOUS', 'gitorious.org', :http_url => 'https://gitorious.org', :fallback_to_http => true)
 end
 if !Autoproj.has_source_handler? 'github'
     Autoproj.gitorious_server_configuration('GITHUB', 'github.com', :http_url => 'https://github.com')
