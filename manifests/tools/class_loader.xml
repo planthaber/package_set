@@ -1,0 +1,9 @@
+<package>
+  <description brief="(ROS) Class Loader Library"/>
+  <author></author>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/class_loader</url>
+  <depend package="base/console_bridge" />
+  <depend package="poco" />
+</package>
+

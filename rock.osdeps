@@ -107,15 +107,7 @@ qt-designer:
     macos-brew: qt4
 
 opencv:
-    debian:
-        'wheezy,sid':
-                - libopencv-dev
-    ubuntu:
-        '10.04,10.10,11.04,11.10': nonexistent
-        default:
-                - libopencv-dev
-                - libcv-dev
-                - libhighgui-dev
+    debian, ubuntu: libopencv-dev
     gentoo: media-libs/opencv
     fedora: opencv-devel
     arch,manjarolinux: opencv
@@ -135,4 +127,7 @@ rack-cors: gem
 thin: gem
 grape: gem
 sprockets: gem
+
+poco:
+    debian,ubuntu: libpoco-dev
 

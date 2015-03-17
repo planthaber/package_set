@@ -100,7 +100,6 @@ end
 # So far, bundles are mostly Ruby packages
 def bundle_package(*args, &block)
     ruby_package(*args) do |pkg|
-        Autoproj.env_add_path 'ROCK_BUNDLE_PATH', pkg.srcdir
         if block_given?
             pkg.instance_eval(&block)
         end
